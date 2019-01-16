@@ -19,6 +19,26 @@
 var app = {
     // Application Constructor
     initialize: function() {
+		var a = window.fetch;
+
+	a !== void 0 && (window.fetch = function() {
+		for (var c = arguments.length, b = Array(c), d = 0; d < c; d++) {
+			b[d] = arguments[d];
+		}
+
+		var e = b[0];
+		return "string" == typeof e && e.match(/\.svg/) ? new Promise(function(f, g) {
+			var h = new XMLHttpRequest;
+
+			h.open("GET", e, !0), h.addEventListener("load", function() {
+				f({
+					ok: !0, text: function text() {
+						return Promise.resolve(h.responseText);
+					}
+				});
+			}), h.addEventListener("error", g), h.send();
+		}) : a.apply(void 0, b);
+	});
     },
 
     // deviceready Event Handler
@@ -34,31 +54,3 @@ var app = {
 };
 
 app.initialize();
-
-/** Patch for the Fetch API not working with file:/// */
-		"use strict";
-
-		function androidFetchWorkaround() {
-			var a = window.fetch;
-
-			a !== void 0 && (window.fetch = function() {
-				for (var c = arguments.length, b = Array(c), d = 0; d < c; d++) {
-					b[d] = arguments[d];
-				}
-
-				var e = b[0];
-				return "string" == typeof e && e.match(/\.svg/) ? new Promise(function(f, g) {
-					var h = new XMLHttpRequest;
-
-					h.open("GET", e, !0), h.addEventListener("load", function() {
-						f({
-							ok: !0, text: function text() {
-								return Promise.resolve(h.responseText);
-							}
-						});
-					}), h.addEventListener("error", g), h.send();
-				}) : a.apply(void 0, b);
-			});
-		}
-
-		androidFetchWorkaround();
